@@ -4,8 +4,7 @@ import (
 	"flag"
 	"sync"
 
-	"frontend-project/internal/config"
-
+	"github.com/coby9241/frontend-service/internal/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // dialect imported to recognise it is using pg backend
 	"github.com/qor/validations"

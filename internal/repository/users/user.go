@@ -1,8 +1,7 @@
 package users
 
 import (
-	"frontend-project/internal/models/users"
-
+	"github.com/coby9241/frontend-service/internal/models/users"
 	"github.com/jinzhu/gorm"
 )
 

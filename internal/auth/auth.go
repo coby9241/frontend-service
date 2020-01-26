@@ -1,10 +1,9 @@
 package auth
 
 import (
-	log "frontend-project/internal/logger"
-	"frontend-project/internal/models/users"
-	repo "frontend-project/internal/repository/users"
-
+	log "github.com/coby9241/frontend-service/internal/logger"
+	"github.com/coby9241/frontend-service/internal/models/users"
+	repo "github.com/coby9241/frontend-service/internal/repository/users"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"

@@ -3,8 +3,7 @@ package encryptor
 import (
 	"sync"
 
-	"frontend-project/internal/config"
-
+	"github.com/coby9241/frontend-service/internal/config"
 	"golang.org/x/crypto/bcrypt"
 )
 

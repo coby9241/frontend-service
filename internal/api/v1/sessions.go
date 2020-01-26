@@ -3,11 +3,10 @@ package v1
 import (
 	"net/http"
 
-	"frontend-project/internal/auth"
-	log "frontend-project/internal/logger"
-	"frontend-project/internal/models/users"
-	"frontend-project/internal/response"
-
+	"github.com/coby9241/frontend-service/internal/auth"
+	log "github.com/coby9241/frontend-service/internal/logger"
+	"github.com/coby9241/frontend-service/internal/models/users"
+	"github.com/coby9241/frontend-service/internal/response"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )

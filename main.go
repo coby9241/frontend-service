@@ -10,16 +10,15 @@ import (
 	"syscall"
 	"time"
 
-	"frontend-project/internal/api"
-	"frontend-project/internal/auth"
-	"frontend-project/internal/bindatafs"
-	"frontend-project/internal/config"
-	"frontend-project/internal/db"
-	"frontend-project/internal/encryptor"
-	log "frontend-project/internal/logger"
-	"frontend-project/internal/models/users"
-	userRepo "frontend-project/internal/repository/users"
-
+	"github.com/coby9241/frontend-service/internal/api"
+	"github.com/coby9241/frontend-service/internal/auth"
+	"github.com/coby9241/frontend-service/internal/bindatafs"
+	"github.com/coby9241/frontend-service/internal/config"
+	"github.com/coby9241/frontend-service/internal/db"
+	"github.com/coby9241/frontend-service/internal/encryptor"
+	log "github.com/coby9241/frontend-service/internal/logger"
+	"github.com/coby9241/frontend-service/internal/models/users"
+	userRepo "github.com/coby9241/frontend-service/internal/repository/users"
 	"github.com/gin-gonic/gin"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
@@ -131,7 +130,7 @@ func mountAssetFiles(r *gin.Engine) {
 	lfs := bindatafs.AssetFS.NameSpace("login")
 	err := lfs.RegisterPath("templates/")
 	if err != nil {
-		log.GetInstance().WithError(err).Fatal("Unable to register tempalte folder for static pages in admin")
+		log.GetInstance().WithError(err).Fatal("Unable to register template folder for static pages in admin")
 	}
 
 	// set files

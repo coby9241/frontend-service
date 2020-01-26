@@ -4,9 +4,9 @@ import (
 	"flag"
 	"time"
 
-	"frontend-project/internal/db"
-	"frontend-project/internal/encryptor"
-	"frontend-project/internal/models/users"
+	"github.com/coby9241/frontend-service/internal/db"
+	"github.com/coby9241/frontend-service/internal/encryptor"
+	"github.com/coby9241/frontend-service/internal/models/users"
 )
 
 var (
