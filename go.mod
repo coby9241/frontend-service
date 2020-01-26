@@ -1,4 +1,4 @@
-module frontend-project
+module github.com/coby9241/frontend-service
 
 go 1.12
 

@@ -2,8 +2,8 @@ package users
 
 import (
 	"errors"
-	"frontend-project/internal/config"
 
+	"github.com/coby9241/frontend-service/internal/config"
 	"github.com/dgrijalva/jwt-go"
 )
 

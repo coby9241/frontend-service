@@ -1,10 +1,10 @@
 package api
 
 import (
-	v1 "frontend-project/internal/api/v1"
-	"frontend-project/internal/auth"
 	"net/http"
 
+	v1 "github.com/coby9241/frontend-service/internal/api/v1"
+	"github.com/coby9241/frontend-service/internal/auth"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )

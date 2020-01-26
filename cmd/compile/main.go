@@ -6,8 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"frontend-project/internal/bindatafs"
-
+	"github.com/coby9241/frontend-service/internal/bindatafs"
 	"github.com/sirupsen/logrus"
 )
 

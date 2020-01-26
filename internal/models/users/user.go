@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"frontend-project/internal/config"
-	"frontend-project/internal/encryptor"
-
+	"github.com/coby9241/frontend-service/internal/config"
+	"github.com/coby9241/frontend-service/internal/encryptor"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 )
