@@ -1,0 +1,7 @@
+# ignore binary
+frontend-project
+
+# IDE related
+.vscode
+.idea
+
