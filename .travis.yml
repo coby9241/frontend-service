@@ -1,8 +1,17 @@
 language: go
 
-go:
-  - 1.12.x
-  - 1.13.x
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
+
+matrix:
+  fast_finish: true
+  include:
+  - go: 1.12.x
+    env: GO111MODULE=on
+  - go: 1.13.x
+  - go: master
 
 services:
   - postgresql
@@ -10,9 +19,14 @@ services:
 before_script:
   - psql -c 'create database admin_test;' -U postgres
 
-env:
-  - GO111MODULE=on
-
 script:
-  - go vet
-  - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+  - make vet
+  - make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+notifications:
+email:
+  on_success: change
+  on_failure: always
