@@ -5,14 +5,16 @@
 
 This is a frontend service consisting of an admin page to manage certain resources and is built with QOR Admin.
 
-## Development
+## Requirements
 
-To compile QOR Admin assets and login template using bindatafs:
-```
- go run cmd/compile/main.go
-```
+- [Docker](https://github.com/docker/docker-ce)
+- [Docker Compose](https://github.com/docker/compose)
+
+## Development
 
 To run locally:
 ```bash
-go run -tags 'bindatafs' main.go
+docker-compose build && docker-compose up
 ```
+
+Then open the Web UI by entering in the url: `http://localhost:8082/admin`.
