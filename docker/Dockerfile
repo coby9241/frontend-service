@@ -5,9 +5,12 @@ ENV TZ=Asia/Singapore
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR $GOPATH/src/github.com/coby9241/frontend-service
-COPY . ./
 
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
+
+COPY . ./
 
 RUN go run cmd/compile/main.go
 
@@ -32,4 +35,4 @@ COPY --from=build-env /go/src/github.com/coby9241/frontend-service/templates ./t
 COPY --from=build-env /go/src/github.com/coby9241/frontend-service/frontend-service ./
 
 RUN chmod +x ./frontend-service
-ENTRYPOINT ["./frontend-service"]
+CMD ["./frontend-service"]
