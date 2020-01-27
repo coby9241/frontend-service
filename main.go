@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/coby9241/frontend-service/internal/bindatafs"
 	"github.com/coby9241/frontend-service/internal/config"
 	"github.com/coby9241/frontend-service/internal/db"
+	"github.com/coby9241/frontend-service/internal/db/migration"
 	"github.com/coby9241/frontend-service/internal/encryptor"
 	log "github.com/coby9241/frontend-service/internal/logger"
 	"github.com/coby9241/frontend-service/internal/models/users"
@@ -26,8 +28,11 @@ import (
 )
 
 func main() {
+	// set up database and run migrations
 	DB := db.GetInstance()
-	DB.AutoMigrate(&users.User{})
+	if err := migration.RunMigrations(DB); err != nil {
+		panic(fmt.Errorf("failed to run migrations due to the following error: %v", err))
+	}
 
 	admAuthConf := &auth.AdminAuthConfig{
 		LoginPath:        "/login",
@@ -130,7 +135,7 @@ func mountAssetFiles(r *gin.Engine) {
 		log.GetInstance().WithError(err).Fatal("Unable to register template folder for static pages in admin")
 	}
 
-	// set files
+	// set html template files
 	logintpl, err := lfs.Asset("login.html")
 	if err != nil {
 		log.GetInstance().WithError(err).Fatal("Unable to find HTML template for login page in admin")
@@ -146,4 +151,7 @@ func mountAssetFiles(r *gin.Engine) {
 	tpl = template.Must(tpl.New("error.tpl").Parse(string(errtpl)))
 
 	r.SetHTMLTemplate(tpl)
+
+	// load css file
+	r.StaticFile("main.css", "./templates/main.css")
 }

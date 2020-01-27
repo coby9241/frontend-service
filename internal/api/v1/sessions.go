@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/coby9241/frontend-service/internal/auth"
@@ -23,16 +24,31 @@ type (
 		Success  bool            `json:"success,omitempty"`
 		TokenSet *users.TokenSet `json:"token_set,omitempty"`
 	}
+
+	// LoginForm is
+	LoginForm struct {
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	}
+)
+
+var (
+	// ErrorUserPasswordIncorrect is
+	ErrorUserPasswordIncorrect = errors.New("username/password incorrect")
+	// ErrorInternalServer is
+	ErrorInternalServer = errors.New("unable to login, please contact your administrator")
 )
 
 // GetLoginPage simply returns the login page
 func GetLoginPage(auth *auth.AdminAuth) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
+		// redirect to admin page directly if cookie is found
 		if sessions.Default(c).Get(auth.Sess.Key) != nil {
 			c.Redirect(http.StatusSeeOther, "/admin")
 			return
 		}
 
+		// render login page
 		c.HTML(http.StatusOK, "login.html", gin.H{})
 	})
 }
@@ -48,32 +64,39 @@ func LoginHandler(auth *auth.AdminAuth) gin.HandlerFunc {
 		// set auth realm
 		c.Header("WWW-Authenticate", realm)
 
+		// get default session
 		session := sessions.Default(c)
-		email := c.PostForm("email")
-		password := c.PostForm("password")
-		if email == "" || password == "" {
-			response.RenderErrorPage(c, http.StatusUnauthorized, "missing username/password")
+
+		// bind inputs from from to struct
+		var l LoginForm
+		if err := c.ShouldBind(&l); err != nil {
+			log.GetInstance().WithError(err).Warn("Couldn't bind form contents to login request struct")
+			response.RenderErrorPage(c, http.StatusInternalServerError, ErrorInternalServer)
 			return
 		}
 
-		i, err := auth.UserRepo.GetUserByUID(email)
+		// check user by UID aka email
+		i, err := auth.UserRepo.GetUserByUID(l.Email)
 		if err != nil {
-			response.RenderErrorPage(c, http.StatusUnauthorized, "username/password incorrect")
+			response.RenderErrorPage(c, http.StatusUnauthorized, ErrorUserPasswordIncorrect)
 			return
 		}
 
-		if err = i.ComparePassword(password); err != nil {
-			response.RenderErrorPage(c, http.StatusUnauthorized, "username/password incorrect")
+		// validate password
+		if err = i.ComparePassword(l.Password); err != nil {
+			response.RenderErrorPage(c, http.StatusUnauthorized, ErrorUserPasswordIncorrect)
 			return
 		}
 
+		// set session cookie
 		session.Set(auth.Sess.Key, i.UID)
-		if err := session.Save(); err != nil {
+		if err = session.Save(); err != nil {
 			log.GetInstance().WithError(err).Warn("Couldn't save session")
-			c.Redirect(http.StatusInternalServerError, "unabled to login, please contact your administrator")
+			response.RenderErrorPage(c, http.StatusInternalServerError, ErrorInternalServer)
 			return
 		}
 
+		// redirect to admin page
 		c.Redirect(http.StatusSeeOther, "/admin")
 	}
 
@@ -83,12 +106,14 @@ func LoginHandler(auth *auth.AdminAuth) gin.HandlerFunc {
 // GetLogout allows the user to disconnect and redirects back to login page
 func GetLogout(auth *auth.AdminAuth) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
+		// delete session key from cookie
 		session := sessions.Default(c)
 		session.Delete(auth.Sess.Key)
 		if err := session.Save(); err != nil {
 			log.GetInstance().WithError(err).Warn("Couldn't save session")
 		}
 
+		// redirect back to login page
 		c.Redirect(http.StatusSeeOther, auth.LoginPath)
 	})
 }

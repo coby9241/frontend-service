@@ -1,6 +1,7 @@
 package response_test
 
 import (
+	"errors"
 	"html/template"
 	"net/http"
 	"net/http/httptest"
@@ -21,5 +22,5 @@ func TestRenderErrorPage(t *testing.T) {
 	router.SetHTMLTemplate(tpl)
 
 	// render page
-	RenderErrorPage(c, http.StatusBadGateway, "server error")
+	RenderErrorPage(c, http.StatusBadGateway, errors.New("server error"))
 }

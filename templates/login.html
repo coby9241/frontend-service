@@ -1,63 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <meta name="description" content="Login - Register Template">
+    <meta name="author" content="Lorenzo Angelino aka MrLolok">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-color: #F2F2F2;
+        }
+    </style>
 </head>
 
-<style>
-    html {
-        height: 100vh;
-    }
-
-    body {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-    }
-
-    form {
-        flex: 1 0 auto;
-    }
-
-    form .has-icon-left {
-        margin-bottom: 5px;
-    }
-
-    form .btn {
-        width: 100%;
-    }
-
-    .container {
-        height: 100%;
-    }
-
-    .columns {
-        height: 100%;
-    }
-</style>
-
 <body>
-    <div class="container">
-        <div class="columns">
-            <div class="col-4 col-mx-auto flex-centered">
-                <form method="POST">
-                    <div class="has-icon-left">
-                        <input class="form-input" name="email" type="mail" placeholder="Email">
-                        <i class="form-icon icon icon-mail"></i>
-                    </div>
-                    <div class="has-icon-left">
-                        <input class="form-input" name="password" type="password" placeholder="Password">
-                        <i class="form-icon icon icon-more-horiz"></i>
-                    </div>
-                    <button class="btn btn-primary input-group-btn">Submit</button>
-                </form>
+    <div id="container-login">
+        <div id="title">
+            <i class="material-icons lock">lock</i> Login
+        </div>
+
+        <form method="POST">
+            <div class="remember-me">
+                <span style="color: #757575">Log in to your account</span>
             </div>
+
+            <div class="input">
+                <div class="input-addon">
+                    <i class="material-icons">face</i>
+                </div>
+                <input id="email" name="email" placeholder="Email" type="email" required class="validate"
+                    autocomplete="off">
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="input">
+                <div class="input-addon">
+                    <i class="material-icons">vpn_key</i>
+                </div>
+                <input id="password" name="password" placeholder="Password" type="password" required class="validate"
+                    autocomplete="off">
+            </div>
+
+            </br>
+            <input type="submit" value="Log In" />
+        </form>
+
+        <div class="register">
+            <span style="color: #657575">Need to change password?</span>
+            <a href="#"><button id="register-link">Change Password</button></a>
         </div>
     </div>
 </body>
