@@ -23,6 +23,12 @@ type (
 		Success  bool            `json:"success,omitempty"`
 		TokenSet *users.TokenSet `json:"token_set,omitempty"`
 	}
+
+	// LoginForm is
+	LoginForm struct {
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	}
 )
 
 // GetLoginPage simply returns the login page
@@ -49,20 +55,20 @@ func LoginHandler(auth *auth.AdminAuth) gin.HandlerFunc {
 		c.Header("WWW-Authenticate", realm)
 
 		session := sessions.Default(c)
-		email := c.PostForm("email")
-		password := c.PostForm("password")
-		if email == "" || password == "" {
+		var l LoginForm
+		c.ShouldBind(&l)
+		if l.Email == "" || l.Password == "" {
 			response.RenderErrorPage(c, http.StatusUnauthorized, "missing username/password")
 			return
 		}
 
-		i, err := auth.UserRepo.GetUserByUID(email)
+		i, err := auth.UserRepo.GetUserByUID(l.Email)
 		if err != nil {
 			response.RenderErrorPage(c, http.StatusUnauthorized, "username/password incorrect")
 			return
 		}
 
-		if err = i.ComparePassword(password); err != nil {
+		if err = i.ComparePassword(l.Password); err != nil {
 			response.RenderErrorPage(c, http.StatusUnauthorized, "username/password incorrect")
 			return
 		}

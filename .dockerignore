@@ -1,0 +1,5 @@
+# ignore command folder
+*.md
+.git
+.gitignore
+docker-compose.yml

@@ -11,10 +11,12 @@ type Config struct {
 	AppEnv     string `envconfig:"APP_ENV" default:"development"`
 	BcryptCost int    `envconfig:"BCRYPT_COST" default:"13"`
 
-	CookieSecret string `envconfig:"COOKIE_SECRET" default:"gEXYRjfN1gSXVuJXnI2x"`
-	JwtKey       string `envconfig:"JWT_KEY" default:"gEXYRjfN1gSXVuJXnI2x"`
+	CookieSecret  string `envconfig:"COOKIE_SECRET" default:"gEXYRjfN1gSXVuJXnI2x"`
+	JwtKey        string `envconfig:"JWT_KEY" default:"gEXYRjfN1gSXVuJXnI2x"`
+	AdminUsername string `envconfig:"ADMIN_USER" default:"admin@data.com"`
+	AdminPassword string `envconfig:"ADMIN_PASSWORD" default:"clearsoup"`
 
-	DatabaseURL     string `envconfig:"DATABASE_URL" default:"postgres://cbloo@localhost:5432/admin_dev?sslmode=disable"`
+	DatabaseURL     string `envconfig:"DATABASE_URL" default:"postgres://postgres@localhost:5432/admin_dev?sslmode=disable"`
 	TestDatabaseURL string `envconfig:"TEST_DATABASE_URL"`
 }
 

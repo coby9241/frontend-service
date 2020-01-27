@@ -1,5 +1,5 @@
 # ignore binary
-frontend-project
+frontend-service
 
 # IDE related
 .vscode

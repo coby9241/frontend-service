@@ -46,4 +46,5 @@ require (
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
 	go.uber.org/zap v1.13.0
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	gopkg.in/gormigrate.v1 v1.6.0
 )
