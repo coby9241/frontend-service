@@ -6,10 +6,10 @@ import "github.com/gin-gonic/gin"
 var ErrTemplateFile = "error.tpl"
 
 // RenderErrorPage is
-func RenderErrorPage(c *gin.Context, errCode int, errMsg string) {
+func RenderErrorPage(c *gin.Context, errCode int, err error) {
 	c.AbortWithStatus(errCode)
 	c.HTML(errCode, ErrTemplateFile, gin.H{
 		"code":    errCode,
-		"message": errMsg,
+		"message": err.Error(),
 	})
 }

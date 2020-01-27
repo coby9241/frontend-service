@@ -31,7 +31,6 @@ func RunMigrations(db *gorm.DB) error {
 		}
 
 		currTime := time.Now()
-
 		usr := users.User{
 			Provider:          "email",
 			UID:               config.GetInstance().AdminUsername,
@@ -47,7 +46,6 @@ func RunMigrations(db *gorm.DB) error {
 			return err
 		}
 
-		// all other foreign keys...
 		return nil
 	})
 
