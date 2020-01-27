@@ -4,9 +4,15 @@ cache:
     - $HOME/.cache/go-build
     - $GOPATH/pkg/mod
 
-go:
-  - 1.12.x
-  - 1.13.x
+matrix:
+  fast_finish: true
+  include:
+  - go: 1.11.x
+    env: GO111MODULE=on
+  - go: 1.12.x
+    env: GO111MODULE=on
+  - go: 1.13.x
+  - go: master
 
 services:
   - postgresql
@@ -20,8 +26,11 @@ env:
     - GOARCH=amd64
 
 script:
-  - go vet
-  - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+  - make vet
+  - make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
 email:

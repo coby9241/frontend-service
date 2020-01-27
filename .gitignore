@@ -7,3 +7,7 @@ frontend-service
 
 # coverage files
 cover.out
+coverage.out
+count.out
+profile.out
+tmp.out
