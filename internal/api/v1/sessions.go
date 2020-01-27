@@ -56,7 +56,12 @@ func LoginHandler(auth *auth.AdminAuth) gin.HandlerFunc {
 
 		session := sessions.Default(c)
 		var l LoginForm
-		c.ShouldBind(&l)
+		if err := c.ShouldBind(&l); err != nil {
+			log.GetInstance().WithError(err).Warn("Couldn't bind form contents to login request struct")
+			c.Redirect(http.StatusInternalServerError, "unable to login, please contact your administrator")
+			return
+		}
+
 		if l.Email == "" || l.Password == "" {
 			response.RenderErrorPage(c, http.StatusUnauthorized, "missing username/password")
 			return
@@ -74,9 +79,9 @@ func LoginHandler(auth *auth.AdminAuth) gin.HandlerFunc {
 		}
 
 		session.Set(auth.Sess.Key, i.UID)
-		if err := session.Save(); err != nil {
+		if err = session.Save(); err != nil {
 			log.GetInstance().WithError(err).Warn("Couldn't save session")
-			c.Redirect(http.StatusInternalServerError, "unabled to login, please contact your administrator")
+			c.Redirect(http.StatusInternalServerError, "unable to login, please contact your administrator")
 			return
 		}
 

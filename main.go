@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -29,7 +30,9 @@ import (
 func main() {
 	// set up database and run migrations
 	DB := db.GetInstance()
-	migration.RunMigrations(DB)
+	if err := migration.RunMigrations(DB); err != nil {
+		panic(fmt.Errorf("failed to run migrations due to the following error: %v", err))
+	}
 
 	admAuthConf := &auth.AdminAuthConfig{
 		LoginPath:        "/login",
