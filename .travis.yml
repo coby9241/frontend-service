@@ -1,4 +1,8 @@
 language: go
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
 
 go:
   - 1.12.x
@@ -11,8 +15,15 @@ before_script:
   - psql -c 'create database admin_test;' -U postgres
 
 env:
-  - GO111MODULE=on
+  global:
+    - GO111MODULE=on
+    - GOARCH=amd64
 
 script:
   - go vet
   - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+notifications:
+email:
+  on_success: change
+  on_failure: always
