@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -54,8 +53,6 @@ func main() {
 			if len(values) > 0 {
 				if np := values[0]; np != "" {
 					pwd, err := encryptor.GetInstance().Digest(np)
-					fmt.Println(values[0])
-					fmt.Println(pwd)
 					if err != nil {
 						context.DB.AddError(validations.NewError(user, "Password", "Can't encrypt password")) // nolint: gosec,errcheck
 						return
