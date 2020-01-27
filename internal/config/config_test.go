@@ -59,7 +59,6 @@ func TestGoodConfig(t *testing.T) {
 				if err := recover(); (err != nil) != tc.wantErr {
 					t.Errorf("failed test to load config. wantErr: %v, err: %v", tc.wantErr, err)
 				}
-				return
 			}()
 
 			// set env vars

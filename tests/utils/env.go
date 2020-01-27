@@ -14,6 +14,7 @@ func SetTestEnv(environ []EnvPair) func() {
 		os.Setenv(v.Key, v.Value)
 		v.Value = old
 	}
+
 	return func() { // Restore old environment after the test completes.
 		for _, v := range environ {
 			if v.Value == "" {
