@@ -5,3 +5,5 @@ frontend-project
 .vscode
 .idea
 
+# coverage files
+cover.out

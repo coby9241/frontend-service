@@ -39,6 +39,7 @@ require (
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
 	github.com/sephora-sea/admin v0.0.0-20191018065127-11d9d3c689ba // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/stretchr/testify v1.4.0
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect

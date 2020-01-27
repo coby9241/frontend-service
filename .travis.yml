@@ -12,3 +12,7 @@ before_script:
 
 env:
   - GO111MODULE=on
+
+script:
+  - go vet
+  - go test ./... -race -coverprofile=coverage.txt -covermode=atomic
