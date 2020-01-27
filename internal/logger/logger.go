@@ -16,13 +16,16 @@ var once sync.Once
 // GetInstance returns a Logger pointer to log
 func GetInstance() *Logger {
 	once.Do(func() {
-		instance = &Logger{}
-		// Log as JSON instead of the default ASCII formatter.
-		instance.SetFormatter(&log.JSONFormatter{})
+		instance = log.New()
+		// Log as text with options
+		instance.SetFormatter(&log.TextFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+			FullTimestamp:   true,
+		})
 		// Output to stdout instead of the default stderr
 		// Can be any io.Writer, see below for File example
 		instance.SetOutput(os.Stdout)
-		// Only log the warning severity or above.
+		// Set log level to info by default
 		instance.SetLevel(log.InfoLevel)
 	})
 
