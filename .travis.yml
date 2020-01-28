@@ -21,7 +21,7 @@ before_script:
 
 script:
   - make vet
-  - make test
+  - make test-ci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
