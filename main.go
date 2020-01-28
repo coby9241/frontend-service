@@ -20,6 +20,7 @@ import (
 	log "github.com/coby9241/frontend-service/internal/logger"
 	"github.com/coby9241/frontend-service/internal/models/users"
 	userRepo "github.com/coby9241/frontend-service/internal/repository/users"
+
 	"github.com/gin-gonic/gin"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
@@ -34,6 +35,7 @@ func main() {
 		panic(fmt.Errorf("failed to run migrations due to the following error: %v", err))
 	}
 
+	// set up qor admin interface
 	admAuthConf := &auth.AdminAuthConfig{
 		LoginPath:        "/login",
 		LogoutPath:       "/logout",
@@ -42,52 +44,27 @@ func main() {
 		CookieSecret:     config.GetInstance().CookieSecret,
 	}
 	admAuth := auth.NewAdminAuth(admAuthConf, userRepo.NewUserRepositoryImpl(DB))
-
-	Admin := admin.New(&admin.AdminConfig{
+	adm := admin.New(&admin.AdminConfig{
 		DB:   DB,
 		Auth: admAuth,
 	})
 
-	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
-	user.IndexAttrs("-PasswordHash")
-	user.Meta(&admin.Meta{
-		Name: "PasswordHash",
-		Type: "password",
-		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			values := metaValue.Value.([]string)
-			if len(values) > 0 {
-				if np := values[0]; np != "" {
-					pwd, err := encryptor.GetInstance().Digest(np)
-					if err != nil {
-						context.DB.AddError(validations.NewError(user, "Password", "Can't encrypt password")) // nolint: gosec,errcheck
-						return
-					}
-					u := resource.(*users.User)
-					u.PasswordHash = pwd
-				}
-			}
-		},
-	})
-	user.Meta(&admin.Meta{
-		Name: "PasswordChangedAt",
-		Type: "datetime",
-		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			u := resource.(*users.User)
-			now := time.Now()
-			u.PasswordChangedAt = &now
-		},
-	})
-	user.ShowAttrs("Provider", "UID", "UserID", "Role")
-	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID")
-	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID")
+	// set resources in qor admin
+	addUserResources(adm)
 
 	router := gin.New()
 	mountAssetFiles(router)
-	initializeRoutes(router, Admin, admAuth)
+	initializeRoutes(router, adm, admAuth)
 
+	// run router and wait for termination
+	listenAndServe(router)
+}
+
+func listenAndServe(r *gin.Engine) {
+	// init server on port 8082
 	srv := &http.Server{
 		Addr:    ":8082",
-		Handler: router,
+		Handler: r,
 	}
 
 	go func() {
@@ -154,4 +131,39 @@ func mountAssetFiles(r *gin.Engine) {
 
 	// load css file
 	r.StaticFile("main.css", "./templates/main.css")
+}
+
+func addUserResources(adm *admin.Admin) {
+	user := adm.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
+	user.IndexAttrs("-PasswordHash")
+	user.Meta(&admin.Meta{
+		Name: "PasswordHash",
+		Type: "password",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			values := metaValue.Value.([]string)
+			if len(values) > 0 {
+				if np := values[0]; np != "" {
+					pwd, err := encryptor.GetInstance().Digest(np)
+					if err != nil {
+						context.DB.AddError(validations.NewError(user, "Password", "Can't encrypt password")) // nolint: gosec,errcheck
+						return
+					}
+					u := resource.(*users.User)
+					u.PasswordHash = pwd
+				}
+			}
+		},
+	})
+	user.Meta(&admin.Meta{
+		Name: "PasswordChangedAt",
+		Type: "datetime",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			u := resource.(*users.User)
+			now := time.Now()
+			u.PasswordChangedAt = &now
+		},
+	})
+	user.ShowAttrs("Provider", "UID", "UserID", "Role")
+	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID")
+	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID")
 }

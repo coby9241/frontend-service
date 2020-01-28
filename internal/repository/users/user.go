@@ -5,8 +5,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// Repository is
-type Repository interface {
+// UserRepository is
+type UserRepository interface {
 	GetUserByUID(uid string) (*users.User, error)
 }
 
@@ -16,7 +16,7 @@ type UserRepositoryImpl struct {
 }
 
 // NewUserRepositoryImpl is
-func NewUserRepositoryImpl(storage *gorm.DB) Repository {
+func NewUserRepositoryImpl(storage *gorm.DB) UserRepository {
 	return &UserRepositoryImpl{
 		DB: storage,
 	}

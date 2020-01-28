@@ -1,7 +1,6 @@
 package db
 
 import (
-	"flag"
 	"sync"
 
 	"github.com/coby9241/frontend-service/internal/config"
@@ -12,18 +11,18 @@ import (
 
 var instance *gorm.DB
 var once sync.Once
+var databaseURL string
+
+// init will instantiate the uri to the one in the configuration and variable is sourced out to allow for
+// dependency injection for testing
+func init() {
+	databaseURL = config.GetInstance().DatabaseURL
+}
 
 // GetInstance is
 func GetInstance() *gorm.DB {
 	once.Do(func() {
 		var err error
-		var databaseURL string
-		if flag.Lookup("test.v") == nil {
-			databaseURL = config.GetInstance().DatabaseURL
-		} else {
-			databaseURL = config.GetInstance().TestDatabaseURL
-		}
-
 		if instance, err = gorm.Open("postgres", databaseURL); err != nil {
 			panic(err)
 		}
