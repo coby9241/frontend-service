@@ -13,7 +13,7 @@ import (
 type (
 	// AdminAuth is
 	AdminAuth struct {
-		UserRepo   repo.Repository
+		UserRepo   repo.UserRepository
 		LoginPath  string
 		LogoutPath string
 		Realm      string
@@ -39,7 +39,7 @@ type (
 )
 
 // NewAdminAuth is
-func NewAdminAuth(conf *AdminAuthConfig, repo repo.Repository) *AdminAuth {
+func NewAdminAuth(conf *AdminAuthConfig, repo repo.UserRepository) *AdminAuth {
 	return &AdminAuth{
 		LoginPath:  conf.LoginPath,
 		LogoutPath: conf.LogoutPath,

@@ -4,10 +4,12 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      target: build-env
     ports:
       - '8082:8082'
     depends_on:
       - db
+    command: go run -tags 'bindatafs' main.go
     restart: on-failure
     environment:
       DATABASE_URL: postgres://postgres@db:5432/admin_dev?sslmode=disable

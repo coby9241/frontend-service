@@ -1,9 +1,15 @@
 GO ?= go
 TESTFOLDER := $(shell $(GO) list ./...)
-TESTTAGS ?= ""
+TESTTAGS ?= "integration"
 
 .PHONY: test
 test:
+	$(GO) test ./... -race
+
+test-integration:
+	docker-compose build && docker-compose run web $(GO) test ./... -race -tags $(TESTTAGS) -cover
+
+test-ci:
 	echo "mode: count" > coverage.out
 	for d in $(TESTFOLDER); do \
 		$(GO) test -tags $(TESTTAGS) -v -covermode=count -coverprofile=profile.out $$d > tmp.out; \
