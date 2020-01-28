@@ -5,6 +5,8 @@ package db
 import (
 	"sync"
 	"testing"
+
+	"github.com/coby9241/frontend-service/internal/config"
 )
 
 func TestGetInstance(t *testing.T) {
@@ -15,7 +17,7 @@ func TestGetInstance(t *testing.T) {
 	}{
 		{
 			name:  "test get db success",
-			dburl: "postgres://postgres@db:5432/admin_dev?sslmode=disable",
+			dburl: config.GetInstance().DatabaseURL,
 		},
 		{
 			name:    "test get db failure",
