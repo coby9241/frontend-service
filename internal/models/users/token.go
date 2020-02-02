@@ -28,12 +28,12 @@ func GetClaims(jwtToken string) (*Claims, error) {
 		return []byte(config.GetInstance().JwtKey), nil
 	})
 
-	if err != nil {
-		return nil, err
+	if tkn != nil && !tkn.Valid {
+		return nil, errors.New("token is invalid")
 	}
 
-	if !tkn.Valid {
-		return nil, errors.New("token is invalid")
+	if err != nil {
+		return nil, err
 	}
 
 	return claims, nil

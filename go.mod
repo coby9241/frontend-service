@@ -3,6 +3,7 @@ module github.com/coby9241/frontend-service
 go 1.12
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.4.0
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/aws/aws-sdk-go v1.28.9 // indirect

@@ -12,7 +12,7 @@ type Config struct {
 	BcryptCost int    `envconfig:"BCRYPT_COST" default:"13"`
 
 	CookieSecret  string `envconfig:"COOKIE_SECRET" default:"gEXYRjfN1gSXVuJXnI2x"`
-	JwtKey        string `envconfig:"JWT_KEY" default:"gEXYRjfN1gSXVuJXnI2x"`
+	JwtKey        string `envconfig:"JWT_KEY" default:"85363D33AF8817405E9BD6650A8461AADE33E8D1CD7AF29C13A0C2CF025E35EA"`
 	AdminUsername string `envconfig:"ADMIN_USER" default:"admin@data.com"`
 	AdminPassword string `envconfig:"ADMIN_PASSWORD" default:"clearsoup"`
 
