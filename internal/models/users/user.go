@@ -48,7 +48,7 @@ func (u *User) ComparePassword(password string) error {
 }
 
 // IssueJwtTokenSet is
-func (u *User) IssueJwtTokenSet() (*TokenSet, error) {
+func (u *User) IssueJwtTokenSet(jwtKey interface{}) (*TokenSet, error) {
 	timeNow := time.Now()
 	expiresAt := timeNow.AddDate(1, 0, 0).Unix() // one year
 
@@ -63,7 +63,7 @@ func (u *User) IssueJwtTokenSet() (*TokenSet, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.GetInstance().JwtKey))
+	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return nil, err
 	}
