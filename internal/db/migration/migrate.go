@@ -18,9 +18,23 @@ func RunMigrations(db *gorm.DB) error {
 	m.InitSchema(func(tx *gorm.DB) error {
 		err := tx.AutoMigrate(
 			&users.User{},
+			&users.Role{},
 		).Error
 
 		if err != nil {
+			return err
+		}
+
+		// add basic roles
+		if err := tx.Create(&users.Role{Name: "admin"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&users.Role{Name: "editor"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&users.Role{Name: "viewer"}).Error; err != nil {
 			return err
 		}
 
@@ -37,9 +51,11 @@ func RunMigrations(db *gorm.DB) error {
 			PasswordHash:      string(pwd),
 			UserID:            "admin",
 			PasswordChangedAt: &currTime,
-			CreatedAt:         currTime,
-			UpdatedAt:         currTime,
-			Role:              "admin",
+			Model: gorm.Model{
+				CreatedAt: currTime,
+				UpdatedAt: currTime,
+			},
+			Role: users.Role{Name: "admin"},
 		}
 
 		if err = tx.Save(&usr).Error; err != nil {

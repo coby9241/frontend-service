@@ -12,14 +12,12 @@ import (
 
 // User is
 type User struct {
-	ID        uint `gorm:"primary_key"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
 
 	UID               string `gorm:"column:uid" sql:"type:varchar;unique_index:uix_identity_uid;index:idx_identity_uid_provider" valid:"required"` // username/email
 	Provider          string `sql:"type:varchar;index:idx_identity_uid_provider" valid:"required,in(email)"`                                       // phone, email, github...
 	PasswordHash      string `gorm:"column:password;not null"`
-	Role              string
+	Role              Role   `gorm:"foreignkey:ID"`
 	UserID            string `sql:"type:varchar"` // user's name
 	PasswordChangedAt *time.Time
 }
