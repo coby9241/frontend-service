@@ -164,6 +164,6 @@ func addUserResources(adm *admin.Admin) {
 		},
 	})
 	user.ShowAttrs("Provider", "UID", "UserID", "Role")
-	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID")
-	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID")
+	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
+	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
 }

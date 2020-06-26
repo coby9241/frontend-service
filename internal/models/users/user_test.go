@@ -46,8 +46,8 @@ func (u *UserSuite) TestCreateUser() {
 	// 3. commit
 	u.mock.ExpectBegin()
 	u.mock.
-		ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users" ("created_at","updated_at","uid","provider","password","role","user_id","password_changed_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING "users"."id"`)).
-		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), "", "", "password", "", "test", nil).
+		ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users" ("created_at","updated_at","deleted_at","uid","provider","password","role_id","user_id","password_changed_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "users"."id"`)).
+		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), nil, "", "", "password", 0, "test", nil).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).
 			AddRow(1))
 	u.mock.ExpectCommit()

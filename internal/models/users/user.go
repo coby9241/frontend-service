@@ -17,7 +17,8 @@ type User struct {
 	UID               string `gorm:"column:uid" sql:"type:varchar;unique_index:uix_identity_uid;index:idx_identity_uid_provider" valid:"required"` // username/email
 	Provider          string `sql:"type:varchar;index:idx_identity_uid_provider" valid:"required,in(email)"`                                       // phone, email, github...
 	PasswordHash      string `gorm:"column:password;not null"`
-	Role              Role   `gorm:"foreignkey:ID"`
+	Role              Role   `gorm:"foreignkey:RoleID"`
+	RoleID            uint   `gorm:"column:role_id"`
 	UserID            string `sql:"type:varchar"` // user's name
 	PasswordChangedAt *time.Time
 }

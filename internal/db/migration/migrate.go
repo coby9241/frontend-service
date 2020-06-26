@@ -44,6 +44,11 @@ func RunMigrations(db *gorm.DB) error {
 			return err
 		}
 
+		var adminRole users.Role
+		if err := db.Where("name = ?", "admin").First(&adminRole).Error; err != nil {
+			return err
+		}
+
 		currTime := time.Now()
 		usr := users.User{
 			Provider:          "email",
@@ -55,7 +60,7 @@ func RunMigrations(db *gorm.DB) error {
 				CreatedAt: currTime,
 				UpdatedAt: currTime,
 			},
-			Role: users.Role{Name: "admin"},
+			Role: adminRole,
 		}
 
 		if err = tx.Save(&usr).Error; err != nil {
