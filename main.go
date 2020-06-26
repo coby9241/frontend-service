@@ -51,6 +51,7 @@ func main() {
 
 	// set resources in qor admin
 	addUserResources(adm)
+	addRoleResources(adm)
 
 	router := gin.New()
 	mountAssetFiles(router)
@@ -166,4 +167,12 @@ func addUserResources(adm *admin.Admin) {
 	user.ShowAttrs("Provider", "UID", "UserID", "Role")
 	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
 	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
+}
+
+func addRoleResources(adm *admin.Admin) {
+	user := adm.AddResource(&users.Role{}, &admin.Config{Menu: []string{"User Management"}})
+	user.IndexAttrs("-PasswordHash")
+	user.ShowAttrs("Name")
+	user.NewAttrs("Name")
+	user.EditAttrs("Name")
 }
