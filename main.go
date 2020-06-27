@@ -20,7 +20,6 @@ import (
 	log "github.com/coby9241/frontend-service/internal/logger"
 	"github.com/coby9241/frontend-service/internal/models/users"
 	userRepo "github.com/coby9241/frontend-service/internal/repository/users"
-
 	"github.com/gin-gonic/gin"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
@@ -51,7 +50,6 @@ func main() {
 
 	// set resources in qor admin
 	addUserResources(adm)
-	addRoleResources(adm)
 
 	router := gin.New()
 	mountAssetFiles(router)
@@ -135,7 +133,9 @@ func mountAssetFiles(r *gin.Engine) {
 }
 
 func addUserResources(adm *admin.Admin) {
-	user := adm.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
+	user := adm.AddResource(&users.User{}, &admin.Config{
+		Menu: []string{"User Management"},
+	})
 	user.IndexAttrs("-PasswordHash")
 	user.Meta(&admin.Meta{
 		Name: "PasswordHash",
@@ -167,12 +167,4 @@ func addUserResources(adm *admin.Admin) {
 	user.ShowAttrs("Provider", "UID", "UserID", "Role")
 	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
 	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
-}
-
-func addRoleResources(adm *admin.Admin) {
-	user := adm.AddResource(&users.Role{}, &admin.Config{Menu: []string{"User Management"}})
-	user.IndexAttrs("-PasswordHash")
-	user.ShowAttrs("Name")
-	user.NewAttrs("Name")
-	user.EditAttrs("Name")
 }

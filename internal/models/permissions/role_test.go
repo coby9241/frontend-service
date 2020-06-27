@@ -1,9 +1,9 @@
-package users_test
+package permissions_test
 
 import (
 	"testing"
 
-	. "github.com/coby9241/frontend-service/internal/models/users"
+	. "github.com/coby9241/frontend-service/internal/models/permissions"
 	"github.com/stretchr/testify/assert"
 )
 

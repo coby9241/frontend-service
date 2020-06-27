@@ -19,6 +19,8 @@ func RunMigrations(db *gorm.DB) error {
 		err := tx.AutoMigrate(
 			&users.User{},
 			&users.Role{},
+			&users.Resource{},
+			&users.ResourceRole{},
 		).Error
 
 		if err != nil {

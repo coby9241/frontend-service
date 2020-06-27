@@ -6,6 +6,7 @@ import (
 
 	"github.com/coby9241/frontend-service/internal/config"
 	"github.com/coby9241/frontend-service/internal/encryptor"
+	"github.com/coby9241/frontend-service/internal/models/permissions"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 )
@@ -14,14 +15,16 @@ import (
 type User struct {
 	gorm.Model
 
-	UID               string `gorm:"column:uid" sql:"type:varchar;unique_index:uix_identity_uid;index:idx_identity_uid_provider" valid:"required"` // username/email
-	Provider          string `sql:"type:varchar;index:idx_identity_uid_provider" valid:"required,in(email)"`                                       // phone, email, github...
-	PasswordHash      string `gorm:"column:password;not null"`
-	Role              Role   `gorm:"foreignkey:RoleID"`
-	RoleID            uint   `gorm:"column:role_id"`
-	UserID            string `sql:"type:varchar"` // user's name
+	UID               string           `gorm:"column:uid" sql:"type:varchar;unique_index:uix_identity_uid;index:idx_identity_uid_provider" valid:"required"` // username/email
+	Provider          string           `sql:"type:varchar;index:idx_identity_uid_provider" valid:"required,in(email)"`                                       // phone, email, github...
+	PasswordHash      string           `gorm:"column:password;not null"`
+	Role              permissions.Role `gorm:"foreignkey:RoleID"`
+	RoleID            uint             `gorm:"column:role_id"`
+	UserID            string           `sql:"type:varchar"` // user's name
 	PasswordChangedAt *time.Time
 }
+
+var _ permissions.IResource = new(User)
 
 // DisplayName shows the name of the user and if not found, the registered email in the admin dashboard
 func (u User) DisplayName() string {
@@ -71,4 +74,9 @@ func (u *User) IssueJwtTokenSet(jwtKey interface{}) (*TokenSet, error) {
 		Token:         tokenString,
 		ExpiresAtUnix: expiresAt,
 	}, nil
+}
+
+// GetResourceName gets resource name of resource to be managed in RBAC
+func (User) GetResourceName() string {
+	return "user"
 }

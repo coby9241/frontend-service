@@ -57,6 +57,10 @@ func (u *UserSuite) TestCreateUser() {
 	}
 }
 
+func (u *UserSuite) TestGetResourceName() {
+	u.Equal("user", User{}.GetResourceName())
+}
+
 func (u *UserSuite) TestDisplayName() {
 	cases := []struct {
 		name string
