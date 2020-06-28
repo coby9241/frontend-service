@@ -18,8 +18,8 @@ type User struct {
 	UID               string           `gorm:"column:uid" sql:"type:varchar;unique_index:uix_identity_uid;index:idx_identity_uid_provider" valid:"required"` // username/email
 	Provider          string           `sql:"type:varchar;index:idx_identity_uid_provider" valid:"required,in(email)"`                                       // phone, email, github...
 	PasswordHash      string           `gorm:"column:password;not null"`
-	Role              permissions.Role `gorm:"foreignkey:RoleID"`
-	RoleID            uint             `gorm:"column:role_id"`
+	Role              permissions.Role `gorm:"foreignkey:ID;association_foreignkey:RoleID"`
+	RoleID            uint             `sql:"type:integer REFERENCES roles(id)" gorm:"column:role_id;not null"`
 	UserID            string           `sql:"type:varchar"` // user's name
 	PasswordChangedAt *time.Time
 }

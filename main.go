@@ -19,6 +19,8 @@ import (
 	"github.com/coby9241/frontend-service/internal/encryptor"
 	log "github.com/coby9241/frontend-service/internal/logger"
 	"github.com/coby9241/frontend-service/internal/models/users"
+	"github.com/coby9241/frontend-service/internal/rbac"
+	permRepo "github.com/coby9241/frontend-service/internal/repository/permissions"
 	userRepo "github.com/coby9241/frontend-service/internal/repository/users"
 	"github.com/gin-gonic/gin"
 	"github.com/qor/admin"
@@ -48,8 +50,11 @@ func main() {
 		Auth: admAuth,
 	})
 
+	// get rbac repo
+	permissionsRepo := permRepo.NewPermissionsRepositoryImpl(DB)
+	_ = rbac.Load(permissionsRepo)
 	// set resources in qor admin
-	addUserResources(adm)
+	addUserResources(adm, permissionsRepo)
 
 	router := gin.New()
 	mountAssetFiles(router)
@@ -132,9 +137,16 @@ func mountAssetFiles(r *gin.Engine) {
 	r.StaticFile("main.css", "./templates/main.css")
 }
 
-func addUserResources(adm *admin.Admin) {
+func addUserResources(adm *admin.Admin, repo permRepo.Repository) {
+	// get permissions for user resource
+	userPermissions, err := rbac.ResourceRBAC(users.User{}.GetResourceName(), repo)
+	if err != nil {
+		panic(err)
+	}
+
 	user := adm.AddResource(&users.User{}, &admin.Config{
-		Menu: []string{"User Management"},
+		Menu:       []string{"User Management"},
+		Permission: userPermissions,
 	})
 	user.IndexAttrs("-PasswordHash")
 	user.Meta(&admin.Meta{

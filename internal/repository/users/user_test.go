@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/coby9241/frontend-service/internal/models/permissions"
 	"github.com/coby9241/frontend-service/internal/models/users"
 	. "github.com/coby9241/frontend-service/internal/repository/users"
 
@@ -42,8 +43,14 @@ func (r *UserRepoSuite) TestGetUserByUID() {
 		r.mock.
 			ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users"  WHERE "users"."deleted_at" IS NULL AND ((UID = $1)) ORDER BY "users"."id" ASC LIMIT 1`)).
 			WithArgs("test@data.com").
-			WillReturnRows(sqlmock.NewRows([]string{"id", "uid"}).
-				AddRow(1, "test@data.com"))
+			WillReturnRows(sqlmock.NewRows([]string{"id", "uid", "role_id"}).
+				AddRow(1, "test@data.com", 1))
+
+		r.mock.
+			ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "roles"  WHERE ("id" = $1)`)).
+			WithArgs(1).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).
+				AddRow(1, "tester"))
 
 		usr, err := r.repo.GetUserByUID("test@data.com")
 		r.Assert().NoError(err)
@@ -51,11 +58,16 @@ func (r *UserRepoSuite) TestGetUserByUID() {
 			Model: gorm.Model{
 				ID: 1,
 			},
-			UID: "test@data.com",
+			UID:    "test@data.com",
+			RoleID: 1,
+			Role: permissions.Role{
+				ID:   1,
+				Name: "tester",
+			},
 		}, *usr)
 	})
 
-	// expect failure
+	// expect failure in first query
 	r.T().Run("test failure GetUserByUID", func(t *testing.T) {
 		r.mock.
 			ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users"  WHERE "users"."deleted_at" IS NULL AND ((UID = $1)) ORDER BY "users"."id" ASC LIMIT 1`)).
@@ -64,7 +76,23 @@ func (r *UserRepoSuite) TestGetUserByUID() {
 
 		usr, err := r.repo.GetUserByUID("test@data.com")
 		r.Assert().Error(err)
-		r.Equal(users.User{}, *usr)
+		r.Nil(usr)
+	})
+
+	r.T().Run("test failure GetUserByUID on relation loading", func(t *testing.T) {
+		r.mock.
+			ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users"  WHERE "users"."deleted_at" IS NULL AND ((UID = $1)) ORDER BY "users"."id" ASC LIMIT 1`)).
+			WithArgs("test@data.com").
+			WillReturnRows(sqlmock.NewRows([]string{"id", "uid", "role_id"}).
+				AddRow(1, "test@data.com", 1))
+		r.mock.
+			ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "roles"  WHERE ("id" = $1)`)).
+			WithArgs(1).
+			WillReturnError(errors.New("db error"))
+
+		usr, err := r.repo.GetUserByUID("test@data.com")
+		r.Assert().Error(err)
+		r.Nil(usr)
 	})
 }
 
