@@ -2,6 +2,7 @@ package permissions_test
 
 import (
 	"database/sql"
+	"errors"
 	"regexp"
 	"testing"
 
@@ -68,16 +69,16 @@ func (r *PermRepoSuite) TestCreateNewRole() {
 	})
 
 	// expect failure
-	// r.T().Run("test failure CreateNewRole", func(t *testing.T) {
-	// 	r.mock.
-	// 		ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users"  WHERE "users"."deleted_at" IS NULL AND ((UID = $1)) ORDER BY "users"."id" ASC LIMIT 1`)).
-	// 		WithArgs("test@data.com").
-	// 		WillReturnError(errors.New("db error"))
+	r.T().Run("test failure CreateNewRole", func(t *testing.T) {
+		r.mock.
+			ExpectQuery(regexp.QuoteMeta(`INSERT INTO "roles" ("created_at","updated_at","name") VALUES ($1,$2,$3) RETURNING "roles"."id"`)).
+			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), "tester").
+			WillReturnError(errors.New("db error"))
 
-	// 	usr, err := r.repo.GetUserByUID("test@data.com")
-	// 	r.Assert().Error(err)
-	// 	r.Equal(users.User{}, *usr)
-	// })
+		role, err := r.repo.CreateNewRole([]*permissions.Resource{{ResourceName: "test"}}, "tester")
+		r.Assert().Error(err)
+		r.Assert().Nil(role)
+	})
 }
 
 func TestPermSuite(t *testing.T) {
