@@ -3,9 +3,9 @@ package permissions_test
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/coby9241/frontend-service/internal/models/permissions"
@@ -97,10 +97,6 @@ func (r *PermRepoSuite) TestCreateNewRole() {
 	})
 }
 
-func fixedFullRe(s string) string {
-	return fmt.Sprintf("^%s$", regexp.QuoteMeta(s))
-}
-
 func (r *PermRepoSuite) TestSetPermissions() {
 	// expect happy path
 	r.T().Run("test success SetPermissions", func(t *testing.T) {
@@ -153,6 +149,84 @@ func (r *PermRepoSuite) TestSetPermissions() {
 			r.T().Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
+}
+
+func (r *PermRepoSuite) TestGetRoles() {
+	// fix time for testing
+	testTime := time.Now()
+	testError := errors.New("GetRoles error")
+
+	cases := []struct {
+		name       string
+		mockExpect func(mock sqlmock.Sqlmock)
+		golden     []permissions.Role
+		wantErr    bool
+	}{
+		{
+			name: "test success GetRoles",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "roles"`)).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name"}).
+						AddRow(1, testTime, testTime, "admin").
+						AddRow(2, testTime, testTime, "editor"))
+			},
+			golden: []permissions.Role{
+				{
+					Name:      "admin",
+					ID:        1,
+					CreatedAt: testTime,
+					UpdatedAt: testTime,
+				},
+				{
+					Name:      "editor",
+					ID:        2,
+					CreatedAt: testTime,
+					UpdatedAt: testTime,
+				},
+			},
+		},
+		{
+			name: "test success GetRoles empty",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "roles"`)).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name"}))
+			},
+			golden: []permissions.Role{},
+		},
+		{
+			name: "test failure GetRoles",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "roles"`)).
+					WillReturnError(testError)
+			},
+			golden:  nil,
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range cases {
+		tc := tt
+		r.T().Run(tc.name, func(t *testing.T) {
+			tc.mockExpect(r.mock)
+
+			// we make sure that all expectations were met
+			defer func() {
+				if err := r.mock.ExpectationsWereMet(); err != nil {
+					r.T().Errorf("there were unfulfilled expectations: %s", err)
+				}
+			}()
+
+			roles, err := r.repo.GetRoles()
+			if (err != nil) != tc.wantErr {
+				t.Errorf("failed test to get roles. wantErr: %v, err: %v", tc.wantErr, err)
+			}
+
+			r.Equal(tc.golden, roles)
+		})
+	}
 }
 
 func TestPermSuite(t *testing.T) {
