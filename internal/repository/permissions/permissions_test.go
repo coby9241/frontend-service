@@ -229,6 +229,169 @@ func (r *PermRepoSuite) TestGetRoles() {
 	}
 }
 
+func (r *PermRepoSuite) TestGetPermissionsForResource() {
+	// fix time for testing
+	testTime := time.Now()
+	testError := errors.New("GetRoles error")
+
+	cases := []struct {
+		name       string
+		mockExpect func(mock sqlmock.Sqlmock)
+		golden     []permissions.RoleAttributes
+		wantErr    bool
+	}{
+		{
+			name: "test success GetRoles",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.MatchExpectationsInOrder(false)
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resources"  WHERE (resource_name = $1) ORDER BY "resources"."id" ASC LIMIT 1`)).
+					WithArgs("user").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "resource_name"}).
+						AddRow(1, testTime, testTime, "user"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT "roles".* FROM "roles" INNER JOIN "resource_role" ON "resource_role"."role_id" = "roles"."id" WHERE ("resource_role"."resource_id" IN ($1))`)).
+					WithArgs(1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name"}).
+						AddRow(1, testTime, testTime, "admin").
+						AddRow(2, testTime, testTime, "editor"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resource_role"  WHERE (resource_id = $1 AND role_id = $2) LIMIT 1`)).
+					WithArgs(1, 1).
+					WillReturnRows(sqlmock.NewRows([]string{"role_id", "resource_id", "can_create", "can_read", "can_update", "can_delete"}).
+						AddRow(1, 1, true, true, true, true))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resource_role"  WHERE (resource_id = $1 AND role_id = $2) LIMIT 1`)).
+					WithArgs(1, 2).
+					WillReturnRows(sqlmock.NewRows([]string{"role_id", "resource_id", "can_create", "can_read", "can_update", "can_delete"}).
+						AddRow(1, 1, true, true, true, false))
+			},
+			golden: []permissions.RoleAttributes{
+				{
+					RoleName:  "admin",
+					CanCreate: true,
+					CanRead:   true,
+					CanUpdate: true,
+					CanDelete: true,
+				},
+				{
+					RoleName:  "editor",
+					CanCreate: true,
+					CanRead:   true,
+					CanUpdate: true,
+					CanDelete: false,
+				},
+			},
+		},
+		{
+			name: "test fail GetRoles, fail to get resource",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.MatchExpectationsInOrder(false)
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resources"  WHERE (resource_name = $1) ORDER BY "resources"."id" ASC LIMIT 1`)).
+					WithArgs("user").
+					WillReturnError(testError)
+			},
+			wantErr: true,
+		},
+		{
+			name: "test fail GetRoles, fail to get roles for resource",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.MatchExpectationsInOrder(false)
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resources"  WHERE (resource_name = $1) ORDER BY "resources"."id" ASC LIMIT 1`)).
+					WithArgs("user").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "resource_name"}).
+						AddRow(1, testTime, testTime, "user"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT "roles".* FROM "roles" INNER JOIN "resource_role" ON "resource_role"."role_id" = "roles"."id" WHERE ("resource_role"."resource_id" IN ($1))`)).
+					WithArgs(1).
+					WillReturnError(testError)
+			},
+			wantErr: true,
+		},
+		{
+			name: "test fail GetRoles, fail to get permissions for resource & 1st role",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.MatchExpectationsInOrder(false)
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resources"  WHERE (resource_name = $1) ORDER BY "resources"."id" ASC LIMIT 1`)).
+					WithArgs("user").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "resource_name"}).
+						AddRow(1, testTime, testTime, "user"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT "roles".* FROM "roles" INNER JOIN "resource_role" ON "resource_role"."role_id" = "roles"."id" WHERE ("resource_role"."resource_id" IN ($1))`)).
+					WithArgs(1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name"}).
+						AddRow(1, testTime, testTime, "admin").
+						AddRow(2, testTime, testTime, "editor"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resource_role"  WHERE (resource_id = $1 AND role_id = $2) LIMIT 1`)).
+					WithArgs(1, 1).
+					WillReturnError(testError)
+			},
+			wantErr: true,
+		},
+		{
+			name: "test fail GetRoles, fail to get permissions for resource & 2nd role",
+			mockExpect: func(mock sqlmock.Sqlmock) {
+				mock.MatchExpectationsInOrder(false)
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resources"  WHERE (resource_name = $1) ORDER BY "resources"."id" ASC LIMIT 1`)).
+					WithArgs("user").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "resource_name"}).
+						AddRow(1, testTime, testTime, "user"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT "roles".* FROM "roles" INNER JOIN "resource_role" ON "resource_role"."role_id" = "roles"."id" WHERE ("resource_role"."resource_id" IN ($1))`)).
+					WithArgs(1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "name"}).
+						AddRow(1, testTime, testTime, "admin").
+						AddRow(2, testTime, testTime, "editor"))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resource_role"  WHERE (resource_id = $1 AND role_id = $2) LIMIT 1`)).
+					WithArgs(1, 1).
+					WillReturnRows(sqlmock.NewRows([]string{"role_id", "resource_id", "can_create", "can_read", "can_update", "can_delete"}).
+						AddRow(1, 1, true, true, true, true))
+
+				mock.
+					ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "resource_role"  WHERE (resource_id = $1 AND role_id = $2) LIMIT 1`)).
+					WithArgs(1, 2).
+					WillReturnError(testError)
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range cases {
+		tc := tt
+		r.T().Run(tc.name, func(t *testing.T) {
+			tc.mockExpect(r.mock)
+
+			// we make sure that all expectations were met
+			defer func() {
+				if err := r.mock.ExpectationsWereMet(); err != nil {
+					r.T().Errorf("there were unfulfilled expectations: %s", err)
+				}
+			}()
+
+			roles, err := r.repo.GetPermissionsForResource("user")
+			if (err != nil) != tc.wantErr {
+				t.Errorf("failed test to get roles. wantErr: %v, err: %v", tc.wantErr, err)
+			}
+
+			r.Equal(tc.golden, roles)
+		})
+	}
+}
+
 func TestPermSuite(t *testing.T) {
 	suite.Run(t, new(PermRepoSuite))
 }
