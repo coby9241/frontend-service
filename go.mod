@@ -26,7 +26,7 @@ require (
 	github.com/qor/oss v0.0.0-20191031055114-aef9ba66bf76 // indirect
 	github.com/qor/qor v0.0.0-20191022064424-b3deff729f68
 	github.com/qor/responder v0.0.0-20171031032654-b6def473574f // indirect
-	github.com/qor/roles v0.0.0-20171127035124-d6375609fe3e // indirect
+	github.com/qor/roles v0.0.0-20171127035124-d6375609fe3e
 	github.com/qor/serializable_meta v0.0.0-20180510060738-5fd8542db417 // indirect
 	github.com/qor/session v0.0.0-20170907035918-8206b0adab70 // indirect
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
