@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 	"github.com/coby9241/frontend-service/internal/db/migration"
 	"github.com/coby9241/frontend-service/internal/encryptor"
 	log "github.com/coby9241/frontend-service/internal/logger"
+	"github.com/coby9241/frontend-service/internal/models/permissions"
 	"github.com/coby9241/frontend-service/internal/models/users"
 	"github.com/coby9241/frontend-service/internal/rbac"
 	permRepo "github.com/coby9241/frontend-service/internal/repository/permissions"
@@ -148,7 +150,7 @@ func addUserResources(adm *admin.Admin, repo permRepo.Repository) {
 		Menu:       []string{"User Management"},
 		Permission: userPermissions,
 	})
-	user.IndexAttrs("-PasswordHash")
+	user.IndexAttrs("-PasswordHash", "-RoleID")
 	user.Meta(&admin.Meta{
 		Name: "PasswordHash",
 		Type: "password",
@@ -176,6 +178,46 @@ func addUserResources(adm *admin.Admin, repo permRepo.Repository) {
 			u.PasswordChangedAt = &now
 		},
 	})
+	user.Meta(&admin.Meta{
+		Name: "Role",
+		Type: "select_one",
+		Config: &admin.SelectOneConfig{
+			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
+				var roles []permissions.Role
+				context.DB.Find(&roles)
+
+				for _, n := range roles {
+					idStr := fmt.Sprintf("%d", n.ID)
+					var option = []string{idStr, n.Name}
+					options = append(options, option)
+				}
+
+				return options
+			},
+		},
+		Valuer: func(user interface{}, ctx *qor.Context) interface{} {
+			if user.(*users.User).ID == 0 {
+				return true
+			}
+
+			var role permissions.Role
+			if err = ctx.DB.Model(user.(*users.User)).Related(&role).Error; err != nil {
+				ctx.AddError(errors.New("failed to find role for user"))
+				return nil
+			}
+			return role.Name
+		},
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			var role permissions.Role
+			roleID := metaValue.Value.([]string)[0]
+			context.DB.Where("id = ?", roleID).First(&role)
+
+			user := resource.(*users.User)
+			user.RoleID = role.ID
+			metaValue.Value.([]string)[0] = role.Name
+		},
+	})
+
 	user.ShowAttrs("Provider", "UID", "UserID", "Role")
 	user.NewAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
 	user.EditAttrs("Provider", "UID", "PasswordHash", "UserID", "Role")
