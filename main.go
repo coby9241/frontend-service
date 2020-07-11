@@ -196,10 +196,12 @@ func addUserResources(adm *admin.Admin, repo permRepo.Repository) {
 			},
 		},
 		Valuer: func(user interface{}, ctx *qor.Context) interface{} {
+			// for new user
 			if user.(*users.User).ID == 0 {
 				return true
 			}
 
+			// load relation and get username
 			var role permissions.Role
 			if err = ctx.DB.Model(user.(*users.User)).Related(&role).Error; err != nil {
 				ctx.AddError(errors.New("failed to find role for user"))

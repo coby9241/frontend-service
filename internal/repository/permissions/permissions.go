@@ -77,7 +77,7 @@ func (p *RepositoryImpl) GetPermissionsForResource(resourceName string) ([]permi
 	// get all roles for resource
 	r := permissions.Resource{}
 	var roles []permissions.Role
-	if err := p.DB.Where("name = ?", resourceName).First(&r).Error; err != nil {
+	if err := p.DB.Where("resource_name = ?", resourceName).First(&r).Error; err != nil {
 		return nil, err
 	}
 
