@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/coby9241/frontend-service/internal/api"
+	"github.com/coby9241/frontend-service/internal/app/transactions"
 	"github.com/coby9241/frontend-service/internal/auth"
 	"github.com/coby9241/frontend-service/internal/bindatafs"
 	"github.com/coby9241/frontend-service/internal/config"
@@ -57,6 +58,8 @@ func main() {
 	_ = rbac.Load(permissionsRepo)
 	// set resources in qor admin
 	addUserResources(adm, permissionsRepo)
+	transactions := transactions.App{}
+	transactions.ConfigureAdmin(adm)
 
 	router := gin.New()
 	mountAssetFiles(router)

@@ -17,6 +17,7 @@ type Transaction struct {
 	CancelledReason      string
 	PaymentProviderRefID string
 	PaymentMethod        string
+	State                string
 	ConfirmedAt          *time.Time
 	CompletedAt          *time.Time
 	CancelledAt          *time.Time

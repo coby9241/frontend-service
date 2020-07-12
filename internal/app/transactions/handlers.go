@@ -1,9 +1,9 @@
 package transactions
 
-// unconfirmed
-
-// # End States
-// state :payment_expired
-// state :processed
-// state :cancelled
-// state :failed
+// Initial State
+// - Pending
+// End States
+// - payment_expired
+// - processed
+// - cancelled
+// - failed
