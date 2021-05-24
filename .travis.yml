@@ -21,6 +21,7 @@ before_script:
 
 script:
   - make vet
+  - env
   - make test-ci
 
 after_success:
